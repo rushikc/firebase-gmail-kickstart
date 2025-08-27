@@ -1,0 +1,199 @@
+/*
+Copyright (C) 2025 <rushikc> <rushikc.dev@gmail.com>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details, or get a copy at
+<https://www.gnu.org/licenses/gpl-3.0.txt>.
+*/
+
+
+import {Config, Gmail} from "../Types";
+
+
+const dbName = "Gmail";
+const dbVersion = 4;
+
+type TableNames = "gmail" | "config";
+
+export class GmailIndexDB {
+
+
+    /**
+     * Initializes the IndexedDB database.
+     * Creates object stores and indexes if they don't exist.
+     */
+    static initDB = () => {
+
+        if (!indexedDB) {
+            alert("IndexedDB is not available on this browser, this might increase firebase billing")
+            console.debug("IndexedDB could not be found in this browser.");
+        } else {
+
+            console.debug("Initiating IndexedDB");
+
+            const gmailDB = indexedDB.open(dbName, dbVersion);
+
+            gmailDB.onupgradeneeded = function () {
+
+                const db = gmailDB.result;
+
+                const gmailStore = db.createObjectStore("gmail", {keyPath: "mailId"});
+                gmailStore.createIndex("vendor_index", ["vendor"], {unique: false});
+                gmailStore.createIndex("date_index", ["date"], {unique: false,});
+
+                db.createObjectStore("config", {keyPath: "key"});
+
+                console.debug("Created gmail IndexedDB");
+
+            };
+        }
+    }
+
+
+    /**
+     * Gets an instance of a specific object store from the IndexedDB.
+     * Returns a promise that resolves with the object store instance.
+     */
+    static getStoreInstance = async (storeName: TableNames, mode: IDBTransactionMode = "readwrite"): Promise<IDBObjectStore> => {
+
+        return new Promise((resolve) => {
+            const gmailDB = indexedDB.open(dbName, dbVersion);
+            gmailDB.onsuccess = () => {
+                const db = gmailDB.result;
+                const transaction = db.transaction(storeName, mode);
+                const store = transaction.objectStore(storeName);
+                resolve(store);
+            }
+        })
+
+
+    }
+
+
+    /**
+     * Adds a list of gmails to the 'gmail' object store.
+     */
+    static addGmailList = async (gmailList: Gmail[]) => {
+
+        console.debug("addGmail IndexedDB");
+        const store = await this.getStoreInstance("gmail");
+        gmailList.forEach(gmail => store.put(gmail));
+
+    }
+
+
+    /**
+     * Adds a list of configurations to the 'config' object store.
+     */
+    static addConfig = async (configList: Config[]) => {
+
+        // console.debug("addGmail IndexedDB");
+        const store = await this.getStoreInstance("config");
+        configList.forEach(config => store.put(config));
+
+    }
+
+
+    /**
+     * Retrieves a single data entry from a specified object store using a key.
+     */
+    static getData = async (storeName: TableNames, keyPath: string): Promise<any> => {
+
+        console.debug("getData IndexedDB - ", storeName, keyPath);
+
+        return new Promise((resolve) => {
+            const storePromise = this.getStoreInstance(storeName);
+            storePromise.then(store => {
+                const storeVal = store.get(keyPath);
+                storeVal.onsuccess = () => resolve(storeVal.result);
+            })
+
+        })
+
+    }
+
+    /**
+     * Retrieves all data from a specified object store.
+     */
+    static getAllData = async (storeName: TableNames): Promise<any[]> => {
+
+        console.debug("getAllData IndexedDB - ", storeName);
+
+        return new Promise((resolve) => {
+            const storePromise = this.getStoreInstance(storeName);
+            storePromise.then(store => {
+                const storeVal = store.getAll();
+                storeVal.onsuccess = () => resolve(storeVal.result);
+            })
+
+        })
+
+    }
+
+    /**
+     * Clears all IndexedDB data by deleting the entire database
+     * @returns Promise that resolves when the database is deleted or rejects on error
+     */
+    static clearIndexedDBData = async (): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            try {
+                // Request to delete the entire database
+                const deleteRequest = indexedDB.deleteDatabase(dbName);
+
+                deleteRequest.onsuccess = () => {
+                    console.log("IndexedDB data cleared successfully");
+                    resolve();
+                };
+
+                deleteRequest.onerror = (event) => {
+                    console.error("Error clearing IndexedDB data:", event);
+                    reject(new Error("Failed to clear IndexedDB data"));
+                };
+
+                // Handle if the database is being blocked (e.g., by other connections)
+                deleteRequest.onblocked = () => {
+                    console.warn("Clearing IndexedDB was blocked. Please close other tabs with this app.");
+                    // Try to continue anyway
+                    resolve();
+                };
+            } catch (error) {
+                console.error("Exception when clearing IndexedDB:", error);
+                // Don't fail the process if clearing DB fails
+                resolve();
+            }
+        });
+    }
+
+    /**
+     * Deletes a gmail from the 'gmail' object store by its mailId.
+     */
+    static deleteGmail = async (mailId: string): Promise<void> => {
+        console.debug("deleteGmail IndexedDB - mailId:", mailId);
+
+        return new Promise<void>((resolve, reject) => {
+            this.getStoreInstance("gmail").then(store => {
+                const deleteRequest = store.delete(mailId);
+
+                deleteRequest.onsuccess = () => {
+                    console.debug("Successfully deleted gmail with mailId:", mailId);
+                    resolve();
+                };
+
+                deleteRequest.onerror = (event) => {
+                    console.error("Error deleting gmail:", event);
+                    reject(new Error("Failed to delete gmail"));
+                };
+            }).catch(error => {
+                console.error("Error accessing gmail store:", error);
+                reject(error);
+            });
+        });
+    }
+
+}
