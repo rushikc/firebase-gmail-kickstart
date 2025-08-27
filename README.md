@@ -67,4 +67,5 @@ firebase-gmail-kickstart/
 2. Clone the repo: `git clone <repo-url>`
 3. Install dependencies: `npm install`
 4. Run the React app: `npm start`
-5. Fill in stub logic and learn!
+5. Fill in stub logic bu searching for "TODO" comments and learn!
+6. Start from appScript, then functions, firestore then React app.
