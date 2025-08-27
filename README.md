@@ -1,10 +1,9 @@
 <div align="center">
   <br/>
-  <img src="public/overview.png" alt="Firebase Gmail Kickstart Logo" width="650px" />
+  <img src="public/overview.png" alt="Firebase Gmail Kickstart Logo" width="100%" style="max-width: 1200px;"  />
   <br/>
   <br/>
 </div>
-
 
 
 ---
