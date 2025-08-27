@@ -49,6 +49,8 @@ const invalidResponse = {
     500: "Internal Server Error"
 }
 
+// TODO: Update below function to support the required Gmail JSON structure
+//  if you think current code is not sufficient, though it should work as is. but don't trust me :)
 exports.addJsonData = onRequest(async (req, res) => {
 
     const userEmail = process.env.USER_EMAIL;
