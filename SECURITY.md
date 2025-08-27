@@ -6,7 +6,7 @@ This document outlines the security measures implemented in Firebase Gmail to pr
 
 FirebaseGmail is designed with the following core security principles in mind:
 
-*   **Data Ownership**: You own your data. All financial information is stored in your personal Google Firebase Firestore instance, and FirebaseGmail developers have no access to it.
+*   **Data Ownership**: You own your data. All  information is stored in your personal Google Firebase Firestore instance, and FirebaseGmail developers have no access to it.
 *   **Self-Hosted Infrastructure**: The entire backend, including Cloud Functions and the database, runs within your personal Google Cloud project. This gives you full control over the operational environment.
 *   **Transparency**: The entire codebase is open-source and available on GitHub. You can inspect the code at any time to verify its functionality and security.
 *   **Principle of Least Privilege**: The application and its components only request the minimum permissions necessary to function.
@@ -92,4 +92,4 @@ service cloud.firestore {
 }
 ```
 
-This multi-layered security approach ensures that your financial data remains private and under your control at all times.
+This multi-layered security approach ensures that your  data remains private and under your control at all times.
