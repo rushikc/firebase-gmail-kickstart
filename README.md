@@ -63,9 +63,8 @@ firebase-gmail-kickstart/
 
 ## Getting Started
 
-1. Clone the repo: `git clone <repo-url>`
-2. Install dependencies: `npm install`
-3. Set up Firebase project and authentication (see SETUP.md)
-4. Deploy Apps Script and Cloud Functions
-5. Run the React app: `npm start`
-6. Fill in stub logic and learn!
+1. Set up Firebase project and authentication (see [SETUP.md](SETUP.md))
+2. Clone the repo: `git clone <repo-url>`
+3. Install dependencies: `npm install`
+4. Run the React app: `npm start`
+5. Fill in stub logic and learn!
